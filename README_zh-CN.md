@@ -1,43 +1,46 @@
 # vue-simple-uploader  [![NPM Version][npm-image]][npm-url] [![NPM Downloads][downloads-image]][downloads-url] [![juejin likes][juejin-image]](juejin-url)
 
-> A Vue.js upload component powered by [simple-uploader.js](https://github.com/simple-uploader/Uploader)
+> 一个基于 [simple-uploader.js](https://github.com/simple-uploader/Uploader) 的 Vue 上传组件
 
 ![example](https://github.com/simple-uploader/vue-uploader/blob/master/example/simple-uploader.gif)
 
 ![QQ](https://github.com/simple-uploader/Uploader/blob/develop/assets/simple-uploader-QQ-2.png?raw=true)
 
-[中文](./README_zh-CN.md)
+## 特性
 
-## Features
+* 支持文件、多文件、文件夹上传
 
-* Treat Folder and File as `File`
-* Pause/Resume upload
-* Recover upload
-* Error handling
-* Drag and Drop with folder reader
-* Custom upload buttons
-* Folder Upload
-* Queue management
-* File validation
-* Upload progress
-* Time remaining
-* Chunk uploads
+* 支持拖拽文件、文件夹上传
 
-## Install
+* 统一对待文件和文件夹，方便操作管理
+
+* 可暂停、继续上传
+
+* 错误处理
+
+* 支持“快传”，通过文件判断服务端是否已存在从而实现“快传”
+
+* 上传队列管理，支持最大并发上传
+
+* 分块上传
+
+* 支持进度、预估剩余时间、出错自动重试、重传等操作
+
+## 安装
 
 ``` bash
 npm install vue-simple-uploader --save
 ```
 
-## Notes
+## 笔记周边
 
 - https://www.cnblogs.com/xiahj/p/vue-simple-uploader.html
 - https://github.com/LuoLiangDSGA/spring-learning/tree/master/boot-uploader
 - http://www.smarthu.club
 
-## Usage
+## 使用
 
-### init
+### 初始化
 
 ``` js
 import Vue from 'vue'
@@ -107,27 +110,27 @@ new Vue({
 </style>
 ```
 
-## Components
+## 组件
 
 ### Uploader
 
-Root component.
+上传根组件，可理解为一个上传器。
 
 #### Props
 
 * `options {Object}`
 
-  See [simple-uploader.js options](https://github.com/simple-uploader/Uploader#configuration).
+  参考 [simple-uploader.js 配置](https://github.com/simple-uploader/Uploader/blob/develop/README_zh-CN.md#配置)。
 
-  Besides, some other options are avaliable too:
+  此外，你可以有如下配置项可选：
 
   - `parseTimeRemaining(timeRemaining, parsedTimeRemaining) {Function}`
 
-    this function option to format the current file's time remaining value(seconds, number), you can return your language time remaining text, params:
+    用于格式化你想要剩余时间，一般可以用来做多语言。参数：
 
-    - `timeRemaining{Number}`, time remaining seconds
+    - `timeRemaining{Number}`, 剩余时间，秒为单位
 
-    - `parsedTimeRemaining{String}`, default shown time remaining text, you can use it like this:
+    - `parsedTimeRemaining{String}`, 默认展示的剩余时间内容，你也可以这样做替换使用：
 
       ```js
       parseTimeRemaining: function (timeRemaining, parsedTimeRemaining) {
@@ -139,9 +142,10 @@ Root component.
           .replace(/\sseconds?/, '秒')
       }
       ```
+
   - `categoryMap {Object}`
 
-    File category map, default:
+    文件类型 map，默认：
 
     ```js
     {
@@ -154,11 +158,11 @@ Root component.
 
 * `autoStart {Boolean}`
 
-  Default `true`, Whether the file will be start uploading after it is added.
+  默认 `true`, 是否选择文件后自动开始上传。
 
 * `fileStatusText {Object}`
 
-  Default:
+  默认：
   ```js
   {
     success: 'success',
@@ -168,9 +172,9 @@ Root component.
     waiting: 'waiting'
   }
   ```
-  An object map for file status text.
+  用于转换文件上传状态文本映射对象。
 
-  After 0.6.0, `fileStatusText` can be a function with params `(status, response = null)`, you can control the status text more flexible:
+  0.6.0 版本之后，`fileStatusText` 可以设置为一个函数，参数为 `(status, response = null)`， 第一个 status 为状态，第二个为响应内容，默认 null，示例：
 
   ```js
   fileStatusText(status, response) {
@@ -180,7 +184,7 @@ Root component.
       waiting: 'waiting'
     }
     if (status === 'success' || status === 'error') {
-      // only use response when status is success or error
+      // 只有status为success或者error的时候可以使用 response
 
       // eg:
       // return response data ?
@@ -191,190 +195,191 @@ Root component.
   }
   ```
 
-#### Events
+#### 事件
 
-See [simple-uploader.js uploader/events](https://github.com/simple-uploader/Uploader#events)
+参见 [simple-uploader.js uploader 事件](https://github.com/simple-uploader/Uploader/blob/develop/README_zh-CN.md#事件)
 
-**Note:**
+**注意：**
 
-* All events name will be transformed by [lodash.kebabCase](https://github.com/lodash/lodash/blob/master/kebabCase.js), eg: `fileSuccess` will be transformed to `file-success`
+* 所有的事件都会通过 [lodash.kebabCase](https://github.com/lodash/lodash/blob/master/kebabCase.js) 做转换，例如 `fileSuccess` 就会变成 `file-success`。
 
-* `catchAll` event will not be emited.
+* `catch-all` 这个事件是不会触发的。
 
-* `file-added(file)`, file added event, this event is used for file validation. To reject this file you should set `file.ignored = true`.
+* `file-added(file)`, 添加了一个文件事件，一般用做文件校验，如果设置 `file.ignored = true` 的话这个文件就会被过滤掉。
 
-* `files-added(files, fileList)`, files added event, this event is used for files validation. To reject these files you should set `files.ignored = true` or `fileList.ignored = true`.
+* `files-added(files, fileList)`, 添加了一批文件事件，一般用做一次选择的多个文件进行校验，如果设置 `files.ignored = true` 或者 ``fileList.ignored = true`` 的话本次选择的文件就会被过滤掉。
 
-#### Scoped Slots
+#### 作用域插槽
 
 * `files {Array}`
 
-  An array of files (no folders).
+  纯文件列表，没有文件夹概念。
 
 * `fileList {Array}`
 
-  An array of files and folders.
+  统一对待文件、文件夹列表。
 
 * `started`
 
-  Started uploading or not.
+  是否开始上传了。
 
-#### Get `Uploader` instance
+#### 得到 `Uploader` 实例
 
-You can get it like this:
+可以通过如下方式获得：
 
 ```js
+// 在 uploader 组件上会有 uploader 属性 指向的就是 Uploader 实例
 const uploaderInstance = this.$refs.uploader.uploader
-// now you can call all uploader methods
-// https://github.com/simple-uploader/Uploader#methods
+// 这里可以调用实例方法
+// https://github.com/simple-uploader/Uploader/blob/develop/README_zh-CN.md#方法
 uploaderInstance.cancel()
 ```
 
 ### UploaderBtn
 
-Select files button.
+点选上传文件按钮。
 
 #### Props
 
 * `directory {Boolean}`
 
-  Default `false`, Support selecting Folder
+  默认 `false`, 是否是文件夹上传。
 
 * `single {Boolean}`
 
-  Default `false`, To prevent multiple file uploads if it is `true`.
+  默认 `false`, 如果设为 `true`，则代表一次只能选择一个文件。
 
 * `attrs {Object}`
 
-  Default `{}`, Pass object to set custom attributes on input element.
+  默认 `{}`, 添加到 input 元素上的额外属性。
 
 ### UploaderDrop
 
-Droped files area.
+拖拽上传区域。
 
 ### UploaderList
 
-An array of `Uploader.File` file(folder) objects added by the user, but it treated Folder as `Uploader.File` Object.
+文件、文件夹列表，同等对待。
 
-#### Scoped Slots
+#### 作用域插槽
 
 * `fileList {Array}`
 
-  An array of files and folders.
+  文件、文件夹组成数组。
 
 ### UploaderFiles
 
-An array of `Uploader.File` file objects added by the user.
+文件列表，没有文件夹概念，纯文件列表。
 
-#### Scoped Slots
+#### 作用域插槽
 
 * `files {Array}`
 
-  An array of files (no folders).
+  文件列表。
 
 ### UploaderUnsupport
 
-It will be shown if the current browser do not support HTML5 File API.
+不支持 HTML5 File API 的时候会显示。
 
 ### UploaderFile
 
-File item component.
+文件、文件夹单个组件。
 
 #### Props
 
 * `file {Uploader.File}`
 
-  `Uploader.File` instance.
+  封装的文件实例。
 
 * `list {Boolean}`
 
-  It should be `true` if it is puted in `UploaderList`
+  如果是在 `UploaderList` 组件中使用的话，请设置为 `true`。
 
-#### Scoped Slots
+#### 作用域插槽
 
 * `file {Uploader.File}`
 
-  `Uploader.File` instance.
+  文件实例。
 
 * `list {Boolean}`
 
-  In `UploaderList` component or not.
+  是否在 `UploaderList` 组件中使用。
 
 * `status {String}`
 
-  Current status, the values is one of `success`, `error`, `uploading`, `paused`, `waiting`
+  当前状态，可能是：`success`, `error`, `uploading`, `paused`, `waiting`
 
 * `paused {Boolean}`
 
-  Indicated if the file is paused.
+  是否暂停了。
 
 * `error {Boolean}`
 
-  Indicated if the file has encountered an error.
+  是否出错了。
 
 * `averageSpeed {Number}`
 
-  Average upload speed, bytes per second.
+  平均上传速度，单位字节每秒。
 
 * `formatedAverageSpeed {String}`
 
-  Formated average upload speed, eg: `3 KB / S`
+  格式化后的平均上传速度，类似：`3 KB / S`。
 
 * `currentSpeed {Number}`
 
-  Current upload speed, bytes per second.
+  当前上传速度，单位字节每秒。
 
 * `isComplete {Boolean}`
 
-  Indicated whether the file has completed uploading and received a server response.
+  是否已经上传完成。
 
 * `isUploading {Boolean}`
 
-  Indicated whether file chunks is uploading.
+  是否在上传中。
 
 * `size {Number}`
 
-  Size in bytes of the file.
+  文件或者文件夹大小。
 
 * `formatedSize {Number}`
 
-  Formated file size, eg: `10 KB`.
+  格式化后文件或者文件夹大小，类似：`10 KB`.
 
 * `uploadedSize {Number}`
 
-  Size uploaded in bytes.
+  已经上传大小，单位字节。
 
 * `progress {Number}`
 
-  A number between 0 and 1 indicating the current upload progress of the file.
+  介于 0 到 1 之间的小数，上传进度。
 
 * `progressStyle {String}`
 
-  The file progress element's transform style, eg: `{transform: '-50%'}`.
+  进度样式，transform 属性，类似：`{transform: '-50%'}`.
 
 * `progressingClass {String}`
 
-  The value will be `uploader-file-progressing` if the file is uploading.
+  正在上传中的时候值为：`uploader-file-progressing`。
 
 * `timeRemaining {Number}`
 
-  Remaining time to finish upload file in seconds.
+  预估剩余时间，单位秒。
 
 * `formatedTimeRemaining {String}`
 
-  Formated remaining time, eg: `3 miniutes`.
+  格式化后剩余时间，类似：`3 miniutes`.
 
 * `type {String}`
 
-  File type.
+  文件类型。
 
 * `extension {String}`
 
-  File extension in lowercase.
+  文件名后缀，小写。
 
 * `fileCategory {String}`
 
-  File category, one of `folder`, `document`, `video`, `audio`, `image`, `unknown`.
+  文件分类，其中之一：`folder`, `document`, `video`, `audio`, `image`, `unknown`。
 
 ## Development
 
